@@ -1,0 +1,10 @@
+CREATE DATABASE iam_db;
+CREATE DATABASE regions_db;
+CREATE DATABASE cms_db;
+CREATE DATABASE jewelry_db;
+CREATE DATABASE stones_db;
+CREATE DATABASE inventory_db;
+CREATE DATABASE appointments_db;
+CREATE DATABASE concierge_db;
+CREATE DATABASE orders_db;
+CREATE DATABASE production_db;
