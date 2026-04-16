@@ -23,8 +23,7 @@ const DIAMONDS = [
 
 export function Diamonds() {
   const [activeShapes, setActiveShapes] = useState<string[]>([]);
-  const [caratRange, setCaratRange] = useState([0.5, 5.0]);
-  const [priceRange, setPriceRange] = useState([100000, 10000000]);
+  const caratRange = [0.5, 5.0];
   const [activeColors, setActiveColors] = useState<string[]>([]);
   const [activeClarities, setActiveClarities] = useState<string[]>([]);
 

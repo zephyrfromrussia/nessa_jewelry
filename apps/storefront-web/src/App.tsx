@@ -6,6 +6,7 @@ import { ExclusiveCatalog } from './pages/ExclusiveCatalog';
 import { ItemDetails } from './pages/ItemDetails';
 import { Catalog } from './pages/Catalog';
 import { Diamonds } from './pages/Diamonds';
+import { About } from './pages/About';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/diamonds" element={<Diamonds />} />
             <Route path="/exclusive" element={<ExclusiveCatalog />} />
             <Route path="/exclusive/:id" element={<ItemDetails />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </main>
         <Footer />
