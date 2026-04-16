@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, Search, User, Heart, Globe, ChevronRight } from 'lucide-react';
+import { Menu, Search, User, Heart, Globe, ChevronRight, X } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,6 +20,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const isHome = location.pathname === '/';
@@ -33,9 +34,15 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setActiveMenu(null);
+  }, [location.pathname]);
+
   // Determine navbar theme
-  const isDarkText = !isHome || scrolled || isHovered || activeMenu;
-  const navBg = (scrolled || isHovered || activeMenu) ? 'bg-alrosa-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent';
+  const isDarkText = !isHome || scrolled || isHovered || activeMenu || isMobileMenuOpen;
+  const navBg = (scrolled || isHovered || activeMenu || isMobileMenuOpen) ? 'bg-alrosa-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent';
   const textColor = isDarkText ? 'text-alrosa-dark' : 'text-white';
 
   return (
@@ -49,7 +56,7 @@ export function Navbar() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false);
-          setActiveMenu(null);
+          if (!isMobileMenuOpen) setActiveMenu(null);
         }}
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between h-20">
@@ -69,9 +76,12 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Menu */}
-          <button className="lg:hidden p-2 -ml-2 hover:text-alrosa-accent transition-colors">
-            <Menu size={24} strokeWidth={1.5} />
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden p-2 -ml-2 hover:text-alrosa-accent transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
           </button>
 
           {/* Logo */}
@@ -98,15 +108,15 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mega Menu Dropdown */}
+        {/* Desktop Mega Menu Dropdown */}
         <AnimatePresence>
-          {activeMenu === 'jewelry' && (
+          {activeMenu === 'jewelry' && !isMobileMenuOpen && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute top-20 left-0 w-full bg-alrosa-white border-t border-gray-100 shadow-lg overflow-hidden"
+              className="hidden lg:block absolute top-20 left-0 w-full bg-alrosa-white border-t border-gray-100 shadow-lg overflow-hidden"
             >
               <div className="container mx-auto px-12 py-12 flex">
                 <div className="w-1/4">
@@ -162,16 +172,71 @@ export function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Mobile Fullscreen Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="lg:hidden absolute top-20 left-0 w-full h-[calc(100vh-5rem)] bg-alrosa-white overflow-y-auto"
+            >
+              <div className="px-6 py-8 flex flex-col h-full text-alrosa-dark">
+                <nav className="flex-grow space-y-8">
+                  <div>
+                    <h2 className="text-xl font-serif mb-4 pb-2 border-b border-gray-200">Украшения</h2>
+                    <ul className="space-y-4">
+                      {JEWELRY_MENU.slice(0, 5).map((item) => (
+                        <li key={item.name}>
+                          <Link to={item.link} className="text-sm tracking-wider font-light hover:text-alrosa-accent">
+                            {item.name}
+                          </Link>
+                        </li>
+                      ))}
+                      <li>
+                        <Link to="/jewelry" className="text-xs font-medium tracking-[0.2em] uppercase text-alrosa-accent mt-2 inline-block">
+                          Смотреть все
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <Link to="/diamonds" className="text-xl font-serif block py-4 border-b border-gray-200">
+                      Бриллианты
+                    </Link>
+                  </div>
+                  <div>
+                    <Link to="/exclusive" className="text-xl font-serif block py-4 border-b border-gray-200">
+                      Эксклюзив
+                    </Link>
+                  </div>
+                </nav>
+
+                <div className="mt-12 pt-8 border-t border-gray-200 space-y-6">
+                  <Link to="/profile" className="flex items-center text-sm tracking-widest uppercase">
+                    <User size={18} className="mr-4" /> Личный кабинет
+                  </Link>
+                  <button className="flex items-center text-sm tracking-widest uppercase">
+                    <Globe size={18} className="mr-4" /> Россия (RU)
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
       
-      {/* Overlay backdrop when menu is open */}
+      {/* Overlay backdrop when desktop menu is open */}
       <AnimatePresence>
-        {activeMenu && (
+        {activeMenu && !isMobileMenuOpen && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-alrosa-dark/20 z-40 backdrop-blur-sm"
+            className="hidden lg:block fixed inset-0 bg-alrosa-dark/20 z-40 backdrop-blur-sm"
           />
         )}
       </AnimatePresence>
